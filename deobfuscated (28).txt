@@ -1,0 +1,474 @@
+local _select = select
+local function v119(tbl, idx, ...)
+    local va = {
+        ...,
+    }
+    for i = 1, _select("#", ...) do
+        tbl[idx + i - 1] = va[i]
+    end
+end
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local UserInputService = game:GetService("UserInputService")
+local TweenService = game:GetService("TweenService")
+local LocalPlayer = Players.LocalPlayer
+local s1 = "https://discord.gg/yDGuerHwj2"
+--==================================================
+-- HUB LOADER
+--==================================================
+local function u29()
+    TweenService:Create(Frame2, TweenInfo.new(0.35, Enum.EasingStyle.Back, Enum.EasingDirection.In), {
+        Size = UDim2.new(0, 0, 0, 0),
+        Position = UDim2.new(0.5, 0, 0.5, 0),
+    }):Play()
+    TweenService:Create(BlurEffect, TweenInfo.new(0.4), {
+        Size = 0,
+    }):Play()
+    task.wait(0.45)
+    ScreenGui:Destroy()
+    BlurEffect:Destroy()
+    local u38 = loadstring(game:HttpGet("https://sirius.menu/rayfield"))()
+    local v39 = u38:CreateWindow({
+        Name = "🏀 Basketball Speed Hub",
+        LoadingTitle = "Basketball Speed Hub",
+        LoadingSubtitle = "Key verified ✅",
+        Theme = "Default",
+        ConfigurationSaving = {
+            Enabled = true,
+            FolderName = "BBHub",
+            FileName = "Config",
+        },
+        KeySystem = false,
+    })
+    -- Speed settings
+    local n1 = 80
+    local n2 = 120
+    local u42 = false
+    local u43 = false
+    local u44 = nil
+    local function u45()
+        local Character = LocalPlayer.Character
+        return Character and Character:FindFirstChild("HumanoidRootPart")
+    end
+    local function u46()
+        local Character = LocalPlayer.Character
+        return Character and Character:FindFirstChildOfClass("Humanoid")
+    end
+    local function u47()
+        if u44 then
+            u44:Disconnect()
+            u44 = nil
+        end
+        u44 = RunService.Heartbeat:Connect(function(dt)
+            local v95 = u45()
+            local v96 = u46()
+            if not v95 or not v96 then
+                return
+            end
+            local v97 = u43 and (not not UserInputService:IsKeyDown(Enum.KeyCode.LeftShift) and n2) or n1
+            v96.WalkSpeed = v97
+            local MoveDirection = v96.MoveDirection
+            if MoveDirection.Magnitude > 0.1 then
+                local Unit = Vector3.new(MoveDirection.X, 0, MoveDirection.Z).Unit
+                v95.CFrame = v95.CFrame + Unit * v97 * dt
+            end
+        end)
+    end
+    local function u48()
+        if u44 then
+            u44:Disconnect()
+            u44 = nil
+        end
+        local v65 = u46()
+        if v65 then
+            v65.WalkSpeed = 16
+        end
+    end
+    LocalPlayer.CharacterAdded:Connect(function(character)
+        character:WaitForChild("Humanoid")
+        task.wait(0.5)
+        if u42 then
+            u47()
+        end
+    end)
+    --==================================================
+    -- SPEED
+    --==================================================
+    local v49 = v39:CreateTab("⚡ Speed", 4483362458)
+    v49:CreateToggle({
+        Name = "Super Speed",
+        CurrentValue = false,
+        Flag = "SS",
+        Callback = function(p1)
+            u42 = p1
+            if p1 then
+                u47()
+                u38:Notify({
+                    Title = "⚡ Speed ON",
+                    Content = "Speed: " .. n1,
+                    Duration = 2,
+                })
+                else
+                u48()
+            end
+        end,
+    })
+    v49:CreateSlider({
+        Name = "Speed Value",
+        Range = {
+            [1] = 16,
+            [2] = 500,
+        },
+        Increment = 1,
+        Suffix = " studs/s",
+        CurrentValue = 80,
+        Flag = "SV",
+        Callback = function(p2)
+            n1 = p2
+            if u42 then
+                u47()
+            end
+        end,
+    })
+    v49:CreateDivider()
+    v49:CreateToggle({
+        Name = "Sprint Boost (Hold Shift)",
+        CurrentValue = false,
+        Flag = "SB",
+        Callback = function(p3)
+            u43 = p3
+            if p3 then
+                u38:Notify({
+                    Title = "🚀 Boost ON",
+                    Content = "Hold Shift to burst to " .. n2,
+                    Duration = 2,
+                })
+            end
+        end,
+    })
+    v49:CreateSlider({
+        Name = "Boost Speed (Shift)",
+        Range = {
+            [1] = 50,
+            [2] = 800,
+        },
+        Increment = 10,
+        Suffix = " studs/s",
+        CurrentValue = 120,
+        Flag = "BS",
+        Callback = function(p4)
+            n2 = p4
+        end,
+    })
+    v49:CreateSection("⚡ Presets")
+    for _, v in ipairs({
+        [1] = {
+            [1] = "🐢 Normal",
+            [2] = 16,
+        },
+        [2] = {
+            [1] = "🏃 Fast",
+            [2] = 60,
+        },
+        [3] = {
+            [1] = "⚡ Super",
+            [2] = 120,
+        },
+        [4] = {
+            [1] = "🚀 Godspeed",
+            [2] = 300,
+        },
+        [5] = {
+            [1] = "👹 Insane",
+            [2] = 500,
+        },
+    }) do
+        v49:CreateButton({
+            Name = v[1] .. " (" .. v[2] .. ")",
+            Callback = function()
+                n1 = v[2]
+                if u42 then
+                    u47()
+                end
+                u38:Notify({
+                    Title = "Preset set",
+                    Content = v[1],
+                    Duration = 1,
+                })
+            end,
+        })
+    end
+    --==================================================
+    -- JUMP & MOVEMENT
+    --==================================================
+    local v52 = v39:CreateTab("🏀 Jump & Move", 4483362458)
+    v52:CreateSlider({
+        Name = "Jump Power",
+        Range = {
+            [1] = 50,
+            [2] = 500,
+        },
+        Increment = 5,
+        Suffix = " power",
+        CurrentValue = 50,
+        Flag = "JP",
+        Callback = function(p5)
+            local Character = LocalPlayer.Character
+            if Character then
+                local Humanoid = Character:FindFirstChildOfClass("Humanoid")
+                if Humanoid then
+                    Humanoid.UseJumpPower = true
+                    Humanoid.JumpPower = p5
+                end
+            end
+        end,
+    })
+    v52:CreateToggle({
+        Name = "Infinite Jump",
+        CurrentValue = false,
+        Flag = "IJ",
+        Callback = function(p6)
+            if p6 then
+                UserInputService.JumpRequest:Connect(function()
+                    if u38.Flags.IJ then
+                        local Character = LocalPlayer.Character
+                        if Character then
+                            local Humanoid = Character:FindFirstChildOfClass("Humanoid")
+                            if Humanoid then
+                                Humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
+                            end
+                        end
+                    end
+                end)
+            end
+        end,
+    })
+    v52:CreateToggle({
+        Name = "NoClip",
+        CurrentValue = false,
+        Flag = "NC",
+        Callback = function(p7)
+            if p7 then
+                RunService.Stepped:Connect(function()
+                    if u38.Flags.NC then
+                        local Character = LocalPlayer.Character
+                        if Character then
+                            for _, descendant in ipairs(Character:GetDescendants()) do
+                                if descendant:IsA("BasePart") then
+                                    descendant.CanCollide = false
+                                end
+                            end
+                        end
+                    end
+                end)
+            end
+        end,
+    })
+    local u53 = false
+    local connection = nil
+    local connection2 = nil
+    local u56 = false
+    local function u57()
+        local v76 = nil
+        local t2 = {}
+        local ReplicatedStorage = game:GetService("ReplicatedStorage")
+        local t3 = {
+            [1] = "shoot",
+            [2] = "shot",
+            [3] = "release",
+            [4] = "ball",
+            [5] = "throw",
+            [6] = "score",
+            [7] = "basket",
+            [8] = "launch",
+            [9] = "green",
+            [10] = "timing",
+            [11] = "meter",
+            [12] = "input",
+        }
+        for _, descendant in ipairs(ReplicatedStorage:GetDescendants()) do
+            local v82 = descendant
+            if v82:IsA("RemoteEvent") or v82:IsA("RemoteFunction") then
+                local v83 = v82.Name:lower()
+                for _, v in ipairs(t3) do
+                    if v83:find(v) then
+                        table.insert(t2, v82)
+                        v76 = true
+                    end
+                    if v76 then
+                        break
+                    end
+                end
+            end
+            v76 = false
+        end
+        return t2
+    end
+    local function u58()
+        local v86 = _G.getrawmetatable(_G.game)
+        local __namecall = v86.__namecall
+        setreadonly(v86, false)
+        v86.__namecall = _G.newcclosure(function(p8, ...)
+            local v106 = _G.getnamecallmethod()
+            if u53 and (v106 =  = "FireServer" or v106 =  = "InvokeServer") then
+                local t4 = {}
+                v119(t4, 1, ...)
+                local v108 = (p8 and p8.Name or ""):lower()
+                if v108:find("shoot") or (v108:find("shot") or (v108:find("release") or (v108:find("ball") or (v108:find("throw") or (v108:find("green") or (v108:find("timing") or (v108:find("meter") or v108:find("input")))))))) then
+                    for i2, v in ipairs(t4) do
+                        if type(v) =  = "number" and v > = 0 and v < = 1 then
+                            t4[i2] = 1
+                        end
+                    end
+                    return __namecall(p8, table.unpack(t4))
+                end
+            end
+            return __namecall(p8, ...)
+        end)
+        setreadonly(v86, true)
+        connection = UserInputService.InputBegan:Connect(function(input, gameProcessed)
+            if gameProcessed then
+                return
+            end
+            if input.UserInputType =  = Enum.UserInputType.MouseButton1 or input.KeyCode =  = Enum.KeyCode.F or input.KeyCode =  = Enum.KeyCode.E then
+                u56 = true
+                n8 = _G.tick()
+            end
+        end)
+        connection2 = UserInputService.InputEnded:Connect(function(input, _)
+            if not u53 or not u56 then
+                return
+            end
+            if input.UserInputType =  = Enum.UserInputType.MouseButton1 or input.KeyCode =  = Enum.KeyCode.F or input.KeyCode =  = Enum.KeyCode.E then
+                u56 = false
+                local v115 = u57()
+                for _, v in ipairs(v115) do
+                    pcall(function()
+                        v:FireServer(1)
+                    end)
+                    pcall(function()
+                        v:FireServer(1, true)
+                    end)
+                    pcall(function()
+                        v:FireServer(true, 1)
+                    end)
+                    pcall(function()
+                        v:FireServer(1, 1)
+                    end)
+                end
+            end
+        end)
+        u38:Notify({
+            Title = "🟢 Auto Green ON",
+            Content = "Hold to charge, release anytime = perfect!",
+            Duration = 4,
+        })
+    end
+    local function u59()
+        if connection then
+            connection:Disconnect()
+            connection = nil
+        end
+        if connection2 then
+            connection2:Disconnect()
+            connection2 = nil
+        end
+        u56 = false
+        pcall(function()
+            local v118 = _G.getrawmetatable(_G.game)
+            setreadonly(v118, false)
+            setreadonly(v118, true)
+        end)
+        u38:Notify({
+            Title = "Auto Green OFF",
+            Content = "Shot timing back to normal.",
+            Duration = 2,
+        })
+    end
+    --==================================================
+    -- AUTO GREEN
+    --==================================================
+    local v60 = v39:CreateTab("🟢 Auto Green", 4483362458)
+    v60:CreateToggle({
+        Name = "Auto Perfect Shot",
+        CurrentValue = false,
+        Flag = "AutoGreen",
+        Callback = function(p10)
+            u53 = p10
+            if p10 then
+                u58()
+                else
+                u59()
+            end
+        end,
+    })
+    v60:CreateDivider()
+    v60:CreateLabel("Hold mouse or E/F to charge shot.")
+    v60:CreateLabel("Release at ANY time = auto perfect.")
+    v60:CreateDivider()
+    v60:CreateButton({
+        Name = "🔍 List Shot Remotes",
+        Callback = function()
+            local v89 = u57()
+            if #v89 =  = 0 then
+                u38:Notify({
+                    Title = "None Found",
+                    Content = "No shot remotes found. Auto green still runs via hook.",
+                    Duration = 5,
+                })
+                else
+                for _, v in ipairs(v89) do
+                    u38:Notify({
+                        Title = "Found: " .. v.Name,
+                        Content = v:GetFullName(),
+                        Duration = 6,
+                    })
+                end
+            end
+        end,
+    })
+    --==================================================
+    -- MISC
+    --==================================================
+    local v61 = v39:CreateTab("⚙ Misc", 4483362458)
+    v61:CreateButton({
+        Name = "Reset Character",
+        Callback = function()
+            local Character = LocalPlayer.Character
+            if Character then
+                local Humanoid = Character:FindFirstChildOfClass("Humanoid")
+                if Humanoid then
+                    Humanoid.Health = 0
+                end
+            end
+        end,
+    })
+    v61:CreateButton({
+        Name = "Rejoin Server",
+        Callback = function()
+            _G.game:GetService("TeleportService"):Teleport(_G.game.PlaceId, LocalPlayer)
+        end,
+    })
+    v61:CreateButton({
+        Name = "🔑 Get Key — Discord",
+        Callback = function()
+            pcall(function()
+                setclipboard(s1)
+            end)
+            u38:Notify({
+                Title = "Discord",
+                Content = "discord.gg/yDGuerHwj2 — copied! 📋",
+                Duration = 5,
+            })
+        end,
+    })
+    v61:CreateLabel("✅ Key verified. Full access unlocked.")
+    u38:Notify({
+        Title = "🏀 Hub Loaded!",
+        Content = "Speed + Auto Green ready.",
+        Duration = 5,
+        Image = 4483362458,
+    })
+end
+
+u29()
